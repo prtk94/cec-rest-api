@@ -24,10 +24,13 @@ api = Api(app,
           description="CEC Solar Data Tool. Description goes here"
           # Documentation Description
           )
-if os.environ.get('VCAP_SERVICES'):
+if os.environ.get('HTTPS'):
     @property
     def specs_url(self):
+        """Monkey patch for HTTPS"""
         return url_for(self.endpoint('specs'), _external=True, _scheme='https')
+
+
  
     api.specs_url = specs_url
 
