@@ -3,4 +3,3 @@ Flask-RESTful
 Flask-SQLAlchemy
 uwsgi
 pandas
-json
