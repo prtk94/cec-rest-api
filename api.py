@@ -55,40 +55,49 @@ class SolarRadiationData(Resource):
         user_input = request.json
         print("User inputs")
         print(user_input)
-        latitude = round(user_input['latitude'],1)
-        longitude = round(user_input['longitude'],2)
-        latitude_offset = round((abs(latitude) -10.1)*10)
-        print(f"Data recieved: long: {longitude} lat: {latitude} recieved ")
-        print(f"Data calculated: offset=> {latitude_offset}")
-        months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-        global_solar_irr_data =[]
-        # global year_dfs
-        for i in months:
-            print(f"reading excel for solar data in month {i}")
-            month_df = pd.read_excel(f"Datasets/Solar {i}.xlsx")
-            print(f"file read: Datasets/Solar {i}.xlsx")            
-            month_df.round(1)
-            month_df.set_index('Unnamed: 0',inplace=True)
-            print(f"fetched dataframe for the month {i}")
-            #print(f"About to fetch data from long {longitude} and at offset {latitude_offset}")
-            solar_data = month_df[longitude].iloc[latitude_offset]
-            print(f"Solar data fetched is ==> { round(solar_data,2) }")
-            global_solar_irr_data.append(round(solar_data,2))
+        try:
+            latitude = round(user_input['latitude'],1)
+            longitude = round(user_input['longitude'],2)
+            latitude_offset = round((abs(latitude) -10.1)*10)
+            print(f"Data recieved: long: {longitude} lat: {latitude} recieved ")
+            print(f"Data calculated: offset=> {latitude_offset}")
+            months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+            global_solar_irr_data =[]
+            # global year_dfs
+            for i in months:
+                print(f"reading excel for solar data in month {i}")
+                month_df = pd.read_excel(f"Datasets/Solar {i}.xlsx")
+                print(f"file read: Datasets/Solar {i}.xlsx")            
+                month_df.round(1)
+                month_df.set_index('Unnamed: 0',inplace=True)
+                print(f"fetched dataframe for the month {i}")
+                #print(f"About to fetch data from long {longitude} and at offset {latitude_offset}")
+                solar_data = month_df[longitude].iloc[latitude_offset]
+                print(f"Solar data fetched is ==> { round(solar_data,2) }")
+                global_solar_irr_data.append(round(solar_data,2))
 
-        print(f" Computing Solar Radiation with data fetched....")
-        test_data = getjsondata(global_irr_data=global_solar_irr_data,lat=latitude,time_int=int(user_input['interval']))
-        #test_data = getjsondata() #default args
-        test_data['Time interval'] = test_data['Time interval'].apply(lambda x: str(x)[-8:])
-        resp = Response(response=test_data.to_json( orient='index'),status=200,mimetype="application/json")
-        return (resp)
+            print(f" Computing Solar Radiation with data fetched....")
+            test_data = getjsondata(global_irr_data=global_solar_irr_data,lat=latitude,time_int=int(user_input['interval']))
+            #test_data = getjsondata() #default args
+            test_data['Time interval'] = test_data['Time interval'].apply(lambda x: str(x)[-8:])
+            resp = Response(response=test_data.to_json( orient='index'),status=200,mimetype="application/json")
+            return (resp)
+        except Exception as e:
+            print(e)
+            print("Ran into error. returning with default configs")
+            test_data = getjsondata()
+            resp = Response(response=test_data.to_json( orient='index'),status=200,mimetype="application/json")
+            return (resp)
+
+        
 
 
 if __name__ == '__main__':
     # run the application
 
     port = int(os.environ.get('PORT', 33507)) 
-    app.run(host='0.0.0.0', port=port)
-
+    #app.run(host='0.0.0.0', port=port)
+    app.run(debug=True, port='7000')
 
 '''
 #output model. not coming up on schema yet
