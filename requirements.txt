@@ -4,3 +4,4 @@ flask_restplus
 Flask-SQLAlchemy
 pandas
 matplotlib
+xlrd
