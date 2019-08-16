@@ -24,6 +24,13 @@ api = Api(app,
           description="CEC Solar Data Tool. Description goes here"
           # Documentation Description
           )
+if os.environ.get('VCAP_SERVICES'):
+    @property
+    def specs_url(self):
+        return url_for(self.endpoint('specs'), _external=True, _scheme='https')
+ 
+    api.specs_url = specs_url
+
 
 input_model = api.model('input_data', {
     'latitude': fields.Float,
@@ -78,6 +85,7 @@ class SolarRadiationData(Resource):
 
 if __name__ == '__main__':
     # run the application
+
     port = int(os.environ.get('PORT', 33507)) 
     app.run(host='0.0.0.0', port=port)
 
